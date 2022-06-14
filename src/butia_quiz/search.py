@@ -1,14 +1,29 @@
 #!/usr/bin/env python
-
-import rospy
-from std_msgs.msg import String
-
-# ------------------------
-
+import wolframalpha
 import requests
 from html import unescape
+from .pseudo_nlp import find_question
+import json
 
-def _ask_google(question: str):
+app_id = '2GA6V9-T89KR7AJ2E'
+
+with open('src/butia_quiz/questions/doris_personal_questions.json') as json_file:
+    doris_personal_questions = json.load(json_file)["questions"]
+
+def ask_wolfram(question):
+
+    client = wolframalpha.Client(app_id)
+    try:
+        res = client.query(question)
+        if res['@success'] == 'false':
+            return ''
+        else:
+            answer = next(res.results).text
+            return answer
+    except:
+        return ''
+
+def ask_google(question):
     question = question.replace(' ', '%20')
 
     headers = {
@@ -19,7 +34,7 @@ def _ask_google(question: str):
         'https://www.google.com/search?q={:s}'.format(question),
         headers=headers
     )
-    
+     
     answer = ''
     # classe grande principal
     index = r.text.find('="Z0LcW XcVN5d')
@@ -68,29 +83,44 @@ def _ask_google(question: str):
     answer = unescape(answer)
     return answer
 
-def answer_question(question):
-    question = question.lower()
+def ask_doris(question):
+    question_obj = find_question(question, doris_personal_questions)
+    if question_obj['question'] == '':
+        # answer = "I'm afraid I don't know the answer."
+        answer = ''
+    else: 
+        answer = question_obj['answer']
 
-    answer = _ask_google(question)
-    
     return answer
 
-# ------------------------
+def answer_question(question):
+    answer = ''
 
-def listener_callback(data):
-    rospy.loginfo("Your question was: %s" % data.data)
-    data = data.data
-    ans = answer_question(question=data)
-    if ans != '':
-        rospy.loginfo("Your answer is: %s" % ans)
+    question = question.lower()
+    # if 'oxford' in question:
+    #     # return ask_doris(question)
+    #     answer = ask_doris(question)
+    #     if answer != '':
+    #         return answer
+    
+    # if 'rio grande do sul' in question:
+    #     # return ask_doris(question)
+    #     answer = ask_doris(question)
+    #     if answer != '':
+    #         return answer
+    
+    # if answer == '':
+    answer = ask_google(question)
+    
+    if answer != '':
+        return answer
     else:
-        rospy.loginfo("I\'m sorry. I\'m afraid I do not know the answer for your question")
-
-def listener():
-    rospy.init_node("butia_quiz_listener") # node butia_quiz_listener
-    rospy.Subscriber("butia_quiz", String, callback=listener_callback) # topic butia_quiz
-
-    rospy.spin()
-
-if __name__ == "__main__":
-    listener()
+        answer = ask_doris(question)
+        if answer != '':
+            return answer
+        else:
+            answer = ask_wolfram(question)
+            if answer != '':
+                return answer
+            else:
+                return 'I\'m sorry. I\'m afraid I do not know the answer for your question'
