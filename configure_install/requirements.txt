@@ -1,0 +1,4 @@
+wolframalpha
+nltk
+levenshtein
+google-cloud-speech
