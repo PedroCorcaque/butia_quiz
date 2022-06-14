@@ -161,9 +161,8 @@ include_directories(
 #   scripts/my_python_script
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
-catkin_install_python(PROGRAMS 
-  nodes/talker.py 
-  nodes/listener.py
+catkin_install_python(PROGRAMS
+  nodes/butia_quiz_listen.py
 	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 ## Mark executables for installation
