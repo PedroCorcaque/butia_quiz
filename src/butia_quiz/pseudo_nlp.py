@@ -7,8 +7,11 @@ import string
 import json
 # nltk.download('stopwords')
 # nltk.download('punkt')
+import rospkg
 
-with open('src/butia_quiz/questions/all_questions.json') as json_file:
+PKG_DIR = rospkg.RosPack().get_path('butia_quiz')
+
+with open(PKG_DIR+'/questions/all_questions.json') as json_file:
     all_questions = json.load(json_file)["questions"]
 
 def pre_process_question(question):

@@ -8,10 +8,7 @@ def listener_callback(data):
     rospy.loginfo("Your question was: %s" % data.data)
     data = data.data
     ans = answer_question(question=data)
-    if ans != '':
-        rospy.loginfo("Your answer is: %s" % ans)
-    else:
-        rospy.loginfo("I\'m sorry. I\'m afraid I do not know the answer for your question")
+    rospy.loginfo("Your answer is: %s" % ans) ## Must be published
 
 def listener():
     rospy.loginfo("Iniciou")

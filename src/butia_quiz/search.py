@@ -4,10 +4,13 @@ import requests
 from html import unescape
 from .pseudo_nlp import find_question
 import json
+import rospkg
+
+PKG_DIR = rospkg.RosPack().get_path('butia_quiz')
 
 app_id = '2GA6V9-T89KR7AJ2E'
 
-with open('src/butia_quiz/questions/doris_personal_questions.json') as json_file:
+with open(PKG_DIR+'/questions/doris_personal_questions.json') as json_file:
     doris_personal_questions = json.load(json_file)["questions"]
 
 def ask_wolfram(question):
