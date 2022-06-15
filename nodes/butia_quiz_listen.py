@@ -6,7 +6,9 @@ from std_msgs.msg import String
 from butia_quiz.search import answer_question
 
 def publisherAnswer(answer):
-    publisher_answer = rospy.Publisher("butia_quiz_answer", String, queue_size=1)
+    butia_quiz_publisher = rospy.get_param("topics/butia_quiz/quiz_answer", "butia_quiz_publisher")
+
+    publisher_answer = rospy.Publisher(butia_quiz_publisher, String, queue_size=1)
     publisher_answer.publish(answer)
 
 def callbackListener(data):
@@ -17,8 +19,11 @@ def callbackListener(data):
     publisherAnswer(answer=answer)
 
 def listener():
-    rospy.init_node("butia_quiz") 
-    rospy.Subscriber("butia_quiz_listen", String, callback=callbackListener) 
+    rospy.init_node("butia_quiz_listen") 
+
+    butia_quiz_subscriber = rospy.get_param("topics/butia_quiz/quiz_listen", "butia_quiz_subscriber")
+
+    rospy.Subscriber(butia_quiz_subscriber, String, callback=callbackListener) 
     
     rospy.spin()
 
