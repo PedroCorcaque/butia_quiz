@@ -19,12 +19,13 @@ def callbackListener(data):
     publisherAnswer(answer=answer)
 
 def listener():
-    rospy.init_node("butia_quiz_listen") 
-
     butia_quiz_subscriber = rospy.get_param("topics/butia_quiz/quiz_listen", "butia_quiz_subscriber")
-
     rospy.Subscriber(butia_quiz_subscriber, String, callback=callbackListener) 
-    
+
+    rospy.init_node("butia_quiz_listen", anonymous=False) 
+
+    rospy.loginfo("Listener function is on")
+
     rospy.spin()
 
 if __name__ == "__main__":
