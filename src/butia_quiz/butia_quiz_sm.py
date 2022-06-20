@@ -1,7 +1,9 @@
 import rospy
 from std_msgs.msg import String
 
-from butia_speech.srv import SpeechToText, SpeechToTextResponse
+import time
+
+from butia_speech.srv import SpeechToText
 
 class ButiaQuizSM():
 
@@ -12,6 +14,8 @@ class ButiaQuizSM():
         self.butia_quiz_answer = None
         self.butia_quiz_listen = None
         self._readParameters()
+
+        self.pub = rospy.Publisher(self.butia_quiz_listen, String, queue_size=1)
 
     def toListen(self):
         response = False
@@ -34,21 +38,14 @@ class ButiaQuizSM():
             self.answer = rospy.wait_for_message(self.butia_quiz_answer, String)
             rospy.sleep(0.4)
 
-    def _sendQuestion(self):
-        pub = rospy.Publisher(self.butia_quiz_listen, String, queue_size=1)
-
-        pub.publish(self.question)
-
     def toReseach(self):
         response = False
 
         try:
             self.question = "who is the president of brazil?" # self.question.text
             rospy.loginfo("Your question is: %s" % self.question)
-            
-            self._sendQuestion()
 
-            rospy.loginfo("Your question was published")
+            self.pub.publish(self.question)
 
             self._waitResponse()
 

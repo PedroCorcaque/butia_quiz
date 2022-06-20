@@ -1,4 +1,4 @@
 topics:
   butia_quiz:
-    quiz_listen: "butia_quiz_subscriber"
-    quiz_answer: "butia_quiz_publisher"
+    quiz_listen: "butia_quiz_listen"
+    quiz_answer: "butia_quiz_answer"
