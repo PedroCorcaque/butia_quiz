@@ -3,7 +3,8 @@ from std_msgs.msg import String
 
 import time
 
-from butia_speech.srv import SpeechToText
+from butia_speech.srv import SpeechToText, SynthesizeSpeech
+
 
 class ButiaQuizSM():
 
@@ -22,8 +23,8 @@ class ButiaQuizSM():
 
         rospy.wait_for_service("/butia_speech/asr/transcribe")
         try:
-            synthesize_speech = rospy.ServiceProxy("/butia_speech/asr/transcribe", SpeechToText)
-            self.question = synthesize_speech()
+            speech_to_text = rospy.ServiceProxy("/butia_speech/asr/transcribe", SpeechToText)
+            self.question = speech_to_text()
             print("The question is: %s" % self.question.text)
 
             if response != '':
@@ -36,6 +37,7 @@ class ButiaQuizSM():
     def _waitResponse(self):
         while self.answer is None:
             self.answer = rospy.wait_for_message(self.butia_quiz_answer, String)
+            self.answer = self.answer.data
             rospy.sleep(0.4)
 
     def toReseach(self):
@@ -49,7 +51,9 @@ class ButiaQuizSM():
 
             self._waitResponse()
 
-            rospy.loginfo("Your answer is: %s" % self.answer.data)
+            rospy.loginfo("Your answer is: %s" % self.answer)
+
+            response = True
         except rospy.ROSInternalException as e:
             print(e)
         
@@ -57,9 +61,19 @@ class ButiaQuizSM():
 
     def toTalk(self):
         response = False
-        """ 
-        Call the service of the tts
-        """
+        rospy.loginfo("toTalk entry")
+        rospy.wait_for_service("butia/synthesize_speech")
+        try:
+            rospy.loginfo("toTalk try")
+            synthesize_speech = rospy.ServiceProxy("butia/synthesize_speech", SynthesizeSpeech)
+            synthesize_speech(self.answer, "en")
+
+            if response != '':
+                response = True
+        except rospy.ServiceException as e:
+            rospy.loginfo("toTalk exc")
+            print("Service call failed: %s" % e)
+
         return response
 
     def _readParameters(self):

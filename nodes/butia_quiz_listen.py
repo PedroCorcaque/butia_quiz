@@ -5,28 +5,46 @@ from std_msgs.msg import String
 
 from butia_quiz.search import answer_question
 
-def publisherAnswer(answer):
-    butia_quiz_publisher = rospy.get_param("topics/butia_quiz/quiz_answer", "butia_quiz_answer")
+class ButiaListener():
 
-    publisher_answer = rospy.Publisher(butia_quiz_publisher, String, queue_size=1)
-    publisher_answer.publish(answer)
+    def __init__(self):
+        self.question, self.answer = None, None
 
-def callbackListener(data):
-    question = data.data
-    rospy.loginfo(question)
-    answer = answer_question(question=question)
+        self.butia_quiz_publisher = None
+        self.butia_quiz_subscriber = None
 
-    publisherAnswer(answer=answer)
+        self._readParameters()
+
+        self.publisher_answer = rospy.Publisher(self.butia_quiz_publisher, String, queue_size=1)
+
+        rospy.init_node("butia_quiz_listen", anonymous=False)
+
+    def waitQuestion(self):
+        self.question = rospy.wait_for_message(self.butia_quiz_subscriber, String)
+        self.question = self.question.data
+
+        rospy.loginfo(self.question)
+
+    def answerQuestion(self):
+        self.answer = answer_question(question=self.question)
+        
+        rospy.loginfo(self.answer)
+
+    def publishAnswer(self):
+        self.publisher_answer.publish(self.answer)
+
+    def _readParameters(self):
+        self.butia_quiz_publisher = rospy.get_param("topics/butia_quiz/quiz_answer", "butia_quiz_answer")
+        self.butia_quiz_subscriber = rospy.get_param("topics/butia_quiz/quiz_listen", "butia_quiz_listen")
 
 def listener():
-    butia_quiz_subscriber = rospy.get_param("topics/butia_quiz/quiz_listen", "butia_quiz_listen")
-    rospy.Subscriber(butia_quiz_subscriber, String, callback=callbackListener) 
+    butia_listener = ButiaListener()
 
-    rospy.init_node("butia_quiz_listener", anonymous=False) 
+    butia_listener.waitQuestion()
 
-    rospy.loginfo("Listener function is on")
+    butia_listener.answerQuestion()
 
-    rospy.spin()
+    butia_listener.publishAnswer()
 
 if __name__ == "__main__":
     listener()

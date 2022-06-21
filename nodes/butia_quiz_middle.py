@@ -22,4 +22,5 @@ if __name__ == "__main__":
 
         if not res:
             rospy.loginfo("Problem to talk the answer!")
+        rospy.loginfo("toTalk ok")
 
