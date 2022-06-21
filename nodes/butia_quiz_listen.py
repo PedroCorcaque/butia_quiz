@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 from std_msgs.msg import String
 
-from butia_quiz.search import answer_question
+from butia_quiz_src.search import answer_question
 
 class ButiaListener():
 

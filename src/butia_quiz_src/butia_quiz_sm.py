@@ -1,10 +1,7 @@
 import rospy
 from std_msgs.msg import String
 
-import time
-
 from butia_speech.srv import SpeechToText, SynthesizeSpeech
-
 
 class ButiaQuizSM():
 
@@ -25,8 +22,7 @@ class ButiaQuizSM():
         try:
             speech_to_text = rospy.ServiceProxy("/butia_speech/asr/transcribe", SpeechToText)
             self.question = speech_to_text()
-            print("The question is: %s" % self.question.text)
-
+            
             if response != '':
                 response = True
         except rospy.ServiceException as e:
@@ -45,6 +41,7 @@ class ButiaQuizSM():
 
         try:
             self.question = self.question.text
+            self.question = "what is the capital of Brazil?"
             rospy.loginfo("Your question is: %s" % self.question)
 
             self.pub.publish(self.question)
