@@ -163,7 +163,7 @@ include_directories(
 # )
 catkin_install_python(PROGRAMS
   nodes/butia_quiz_listen.py
-  nodes/butia_quiz_middle.py
+  nodes/butia_quiz.py
 	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 ## Mark executables for installation

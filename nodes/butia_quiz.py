@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import rospy
 
-from butia_quiz.butia_quiz_sm import ButiaQuizSM
+from butia_quiz_src.butia_quiz_sm import ButiaQuizSM
 
 if __name__ == "__main__":
     withQuestion, withAnswer = False, False
