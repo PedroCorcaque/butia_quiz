@@ -5,22 +5,46 @@ from std_msgs.msg import String
 
 from butia_quiz.search import answer_question
 
-def publisherAnswer(answer):
-    publisher_answer = rospy.Publisher("butia_quiz_answer", String, queue_size=1)
-    publisher_answer.publish(answer)
+class ButiaListener():
 
-def callbackListener(data):
-    question = data.data
-    rospy.loginfo(question)
-    answer = answer_question(question=question)
+    def __init__(self):
+        self.question, self.answer = None, None
 
-    publisherAnswer(answer=answer)
+        self.butia_quiz_publisher = None
+        self.butia_quiz_subscriber = None
+
+        self._readParameters()
+
+        self.publisher_answer = rospy.Publisher(self.butia_quiz_publisher, String, queue_size=1)
+
+        rospy.init_node("butia_quiz_listen", anonymous=False)
+
+    def waitQuestion(self):
+        self.question = rospy.wait_for_message(self.butia_quiz_subscriber, String)
+        self.question = self.question.data
+
+        rospy.loginfo(self.question)
+
+    def answerQuestion(self):
+        self.answer = answer_question(question=self.question)
+        
+        rospy.loginfo(self.answer)
+
+    def publishAnswer(self):
+        self.publisher_answer.publish(self.answer)
+
+    def _readParameters(self):
+        self.butia_quiz_publisher = rospy.get_param("topics/butia_quiz/quiz_answer", "butia_quiz_answer")
+        self.butia_quiz_subscriber = rospy.get_param("topics/butia_quiz/quiz_listen", "butia_quiz_listen")
 
 def listener():
-    rospy.init_node("butia_quiz") 
-    rospy.Subscriber("butia_quiz_listen", String, callback=callbackListener) 
-    
-    rospy.spin()
+    butia_listener = ButiaListener()
+
+    butia_listener.waitQuestion()
+
+    butia_listener.answerQuestion()
+
+    butia_listener.publishAnswer()
 
 if __name__ == "__main__":
     listener()
