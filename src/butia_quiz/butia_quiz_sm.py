@@ -44,7 +44,7 @@ class ButiaQuizSM():
         response = False
 
         try:
-            self.question = "who is the president of brazil?" # self.question.text
+            self.question = self.question.text
             rospy.loginfo("Your question is: %s" % self.question)
 
             self.pub.publish(self.question)
@@ -61,17 +61,14 @@ class ButiaQuizSM():
 
     def toTalk(self):
         response = False
-        rospy.loginfo("toTalk entry")
         rospy.wait_for_service("butia/synthesize_speech")
         try:
-            rospy.loginfo("toTalk try")
             synthesize_speech = rospy.ServiceProxy("butia/synthesize_speech", SynthesizeSpeech)
             synthesize_speech(self.answer, "en")
 
             if response != '':
                 response = True
         except rospy.ServiceException as e:
-            rospy.loginfo("toTalk exc")
             print("Service call failed: %s" % e)
 
         return response
