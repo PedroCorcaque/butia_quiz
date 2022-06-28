@@ -18,7 +18,7 @@ class ButiaQuizSM():
     def toListen(self):
         response = False
 
-        rospy.wait_for_service("/butia_speech/asr/transcribe")
+        rospy.wait_for_service("/butia_speech/asr/transcribe", timeout=rospy.Duration(50))
         try:
             speech_to_text = rospy.ServiceProxy("/butia_speech/asr/transcribe", SpeechToText)
             self.question = speech_to_text()
@@ -41,7 +41,7 @@ class ButiaQuizSM():
 
         try:
             self.question = self.question.text
-            self.question = "what is the capital of Brazil?"
+            self.question = "What is the Newest State in Brazil?"
             rospy.loginfo("Your question is: %s" % self.question)
 
             self.pub.publish(self.question)
@@ -58,7 +58,7 @@ class ButiaQuizSM():
 
     def toTalk(self):
         response = False
-        rospy.wait_for_service("butia/synthesize_speech")
+        rospy.wait_for_service("butia/synthesize_speech", timeout=rospy.Duration(10))
         try:
             synthesize_speech = rospy.ServiceProxy("butia/synthesize_speech", SynthesizeSpeech)
             synthesize_speech(self.answer, "en")

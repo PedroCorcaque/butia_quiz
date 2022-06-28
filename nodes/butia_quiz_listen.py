@@ -23,12 +23,8 @@ class ButiaListener():
         self.question = rospy.wait_for_message(self.butia_quiz_subscriber, String)
         self.question = self.question.data
 
-        rospy.loginfo(self.question)
-
     def answerQuestion(self):
         self.answer = answer_question(question=self.question)
-        
-        rospy.loginfo(self.answer)
 
     def publishAnswer(self):
         self.publisher_answer.publish(self.answer)
